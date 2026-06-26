@@ -18,10 +18,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @PageTitle("ACMESpiele - Gerenciamento de Jogos")
-@Route("home")
+@Route("")
 public class MainView extends VerticalLayout {
-    private final Main main;
-
+   
     public MainView() {
         TextField infos = new TextField("Selecione a opção desejada.");
 
