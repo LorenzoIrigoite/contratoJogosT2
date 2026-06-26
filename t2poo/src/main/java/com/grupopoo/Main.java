@@ -1,9 +1,12 @@
 package com.grupopoo;
-import com.grupopoo.app.ACMESpiele;
 
+import com.grupopoo.app.ACMESpiele;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ACMESpiele acmeSpiele = new ACMESpiele();
-        acmeSpiele.executar();
+        SpringApplication.run(Main.class, args);
     }
 }
