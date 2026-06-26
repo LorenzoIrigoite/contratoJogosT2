@@ -1,5 +1,7 @@
 package com.grupopoo.app;
 
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 
 import com.grupopoo.dados.*;
 
+@Service
 public class ACMESpiele {
     // Atributos para redirecionamento de E/S
     
