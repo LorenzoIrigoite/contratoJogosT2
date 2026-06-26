@@ -6,24 +6,24 @@ import com.grupopoo.Main;
 import com.grupopoo.app.ACMESpiele;
 
 
-//import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H1;
 //import com.vaadin.flow.component.html.Hr;
-//import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
+//import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@PageTitle("ACMESpiele - Gerenciamento de Jogos")
-@Route("home")
+@PageTitle("Home")
+@Route("")
 public class MainView extends VerticalLayout {
-    private final Main main;
-
     public MainView() {
-        TextField infos = new TextField("Selecione a opção desejada.");
+        H1 titulo = new H1("ACMESpiele - Gerenciamento de Jogos");
+
+        Paragraph infos = new Paragraph("Selecione a opção desejada:");
 
         Button telaCadastroClientes = new Button("Cadastro de clientes");
         Button telaCadastroJogos = new Button("Cadastro de jogos");
@@ -39,6 +39,7 @@ public class MainView extends VerticalLayout {
             telaCadastroClientes, telaCadastroContratos, telaCadastroJogos, telaGerDados                                   
         );
 
+        add(titulo);
         add(infos);
         add(botoesLayout);
     }
