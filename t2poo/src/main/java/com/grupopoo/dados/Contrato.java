@@ -1,25 +1,36 @@
 package com.grupopoo.dados;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Contrato {
     private int id;
     private int periodo;
-    private Date data;
+    private LocalDate data;
     private Cliente cliente;
     private Jogo jogo;
     private FormaPagamento formaPagamento;
 
-    public Contrato(int id, int periodo, Cliente cliente, Jogo jogo){
+    public Contrato(int id, int periodo, Cliente cliente, Jogo jogo, LocalDate data){
         this.id = id;
         this.periodo = periodo;
         this.cliente = cliente;
         this.jogo = jogo;
+        this.data = data;
+    }
+
+    public Contrato(int id, int periodo, Cliente cliente, Jogo jogo, LocalDate data, FormaPagamento formaPagamento){
+        this.id = id;
+        this.periodo = periodo;
+        this.cliente = cliente;
+        this.jogo = jogo;
+        this.data = data;
+        this.formaPagamento = formaPagamento;
     }
 
     public int getId(){return id;}
     public int getPeriodo(){return periodo;}
     public Cliente getCliente(){return cliente;}
     public Jogo getJogo(){return jogo;}
+    public LocalDate getData(){return data;}
 
     public double calculaValorFinal(){
         double valor = jogo.getValorDiaria();
