@@ -1,5 +1,6 @@
 package com.grupopoo.gui;
 
+import java.util.ArrayList;
 import java.util.Locale;
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -7,9 +8,11 @@ import java.util.stream.Stream;
 import com.grupopoo.dados.CartaoCredito;
 import com.grupopoo.dados.Cliente;
 import com.grupopoo.dados.ClienteRepository;
+import com.grupopoo.dados.ClienteFormaDTO;
 import com.grupopoo.dados.Contrato;
 import com.grupopoo.dados.ContratoRepository;
 import com.grupopoo.dados.FormaPagamento;
+import com.grupopoo.dados.FormaPagamentoRepository;
 import com.grupopoo.dados.Jogo;
 import com.grupopoo.dados.JogoRepository;
 import com.grupopoo.dados.Pix;
@@ -18,6 +21,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -38,44 +42,68 @@ public class CadastroContratosView extends VerticalLayout{
     private ContratoRepository contratos;
     private JogoRepository jogos;
     private ClienteRepository clientes;
+    private FormaPagamentoRepository pagamentos;
 
     private TextField campoId = new TextField("Id:");
-    private TextField campoPeriodo = new TextField("Período");
-    private TextField campoCodigoPagamento = new TextField("Código pagamento:");
-    private TextField campoDiaVencimento = new TextField("Dia de vencimento:");
-    private TextField campoChavePix = new TextField("Chave PIX:");
-    private TextField campoNumeroCartao = new TextField("Número do Cartão:");
-    private TextField campoNomeTitularCartao = new TextField("Nome do Titular:");
-    private TextField campoDataValidadeCartao = new TextField("Vencimento do cartão:");
-    
+    private TextField campoPeriodo = new TextField("Período (dias)");
     private DatePicker campoData = new DatePicker("Data do contrato:");
+    
     private RadioButtonGroup<String> radioFormaPagamento = new RadioButtonGroup<>();
     private Button botaoSalvar = new Button("Cadastrar Contrato");
 
-    private FormLayout formCamposPagamento = new FormLayout();
+    private FormLayout formPagamento = new FormLayout();
     private FormLayout formClientes = new FormLayout();
     private FormLayout formJogos = new FormLayout();
-
+    
+    private FormLayout formContrato = new FormLayout();
     private final Grid<Cliente> gridCliente;
     private final Grid<Jogo> gridJogos;
+    private final Grid<FormaPagamento> gridFormas;
 
     private Cliente clienteSelecionado;
     private Jogo jogoSelecionado;
+    private FormaPagamento formaSelecionada;
 
     @Autowired
-    public CadastroContratosView(ContratoRepository contratos, JogoRepository jogos, ClienteRepository clientes){
+    public CadastroContratosView(ContratoRepository contratos, JogoRepository jogos, ClienteRepository clientes,
+                                 FormaPagamentoRepository pagamentos){
         this.clientes = clientes;
         this.jogos = jogos;
         this.contratos = contratos;
+        this.pagamentos = pagamentos;
 
         H2 tituloPagina = new H2("Cadastro de Contratos");
+        
+        gridFormas = new Grid<>(FormaPagamento.class, false);
+        gridFormas.addColumn(FormaPagamento::getCodigo).setHeader("Código");
+        gridFormas.addColumn(FormaPagamento::getDiaVencimento).setHeader("Dia de Vencimento");
+        gridFormas.addColumn(forma -> {
+            if (forma instanceof Pix)
+                return "PIX";
+            if (forma instanceof CartaoCredito)
+                return "Cartão de Crédito";
+            return "Desconhecido";
+        }).setHeader("Tipo de Pagamento");
+
+        gridFormas.asSingleSelect().addValueChangeListener(event -> {
+            formaSelecionada = event.getValue();
+        });
+        formPagamento.add(gridFormas);
 
 
         gridCliente = new Grid<>(Cliente.class);
         gridCliente.setItems(clientes.getArrayList());
         gridCliente.setColumns("numero", "nome", "email");
-        gridCliente.asSingleSelect().addValueChangeListener(event -> selecionaCliente(event));;
-
+        gridCliente.asSingleSelect().addValueChangeListener(event -> {
+            clienteSelecionado = event.getValue();
+            if (clienteSelecionado != null) {
+                Notification.show("Cliente " + event.getValue().getNome() + " selecionado(a).");
+                buscarEFiltrarPagamentos(clienteSelecionado.getNumero());
+            } else {
+                gridFormas.setItems(new ArrayList<>());
+                formaSelecionada = null;
+            }
+        });
         formClientes.add(gridCliente);
 
 
@@ -85,16 +113,6 @@ public class CadastroContratosView extends VerticalLayout{
         gridJogos.asSingleSelect().addValueChangeListener(event -> selecionaJogo(event));
 
         formJogos.add(gridJogos);
-
-
-        radioFormaPagamento.setLabel("Forma de Pagamento:");
-        radioFormaPagamento.setItems("Cartão de crédito", "PIX", "Não informado");
-        radioFormaPagamento.setValue("Não informado");
-        atualizarCamposPagamento("Não informado");
-        
-        radioFormaPagamento.addValueChangeListener(event -> {
-            atualizarCamposPagamento(event.getValue());
-        });
 
         //setando Locale pt-BR para adaptar a data para DD/MM/AAAA 
         campoData.setLocale(new Locale("pt", "BR"));
@@ -107,14 +125,22 @@ public class CadastroContratosView extends VerticalLayout{
         Stream.of(campoId, campoPeriodo, campoData)
               .forEach(campo -> campo.setRequiredIndicatorVisible(true));
 
-        add(tituloPagina, campoId, campoPeriodo, campoData, formClientes, formJogos, radioFormaPagamento, formCamposPagamento, botaoSalvar);
+
+        formContrato.add(campoId, campoPeriodo, campoData);
+
+        add(tituloPagina, formContrato, formClientes, formPagamento, formJogos, radioFormaPagamento, botaoSalvar);
     }
 
-    private void selecionaCliente(ComponentValueChangeEvent<Grid<Cliente>, Cliente> event){
-        if (event.getValue() == null)
-            return;
-        Notification.show("Cliente " + event.getValue().getNome() + " selecionado(a).");
-        clienteSelecionado = event.getValue();
+    private void buscarEFiltrarPagamentos(int numeroCliente) {
+        ClienteFormaDTO dto = pagamentos.formaPorIdCliente(numeroCliente);
+
+        if (dto == null || dto.getBancoFormas() == null || dto.getBancoFormas().isEmpty()) {
+            Notification.show("Este cliente não possui formas de pagamento cadastradas! Redirecionando para o cadastro...");
+
+            UI.getCurrent().navigate("cadastroFormasPagamento");
+        } else {
+            gridFormas.setItems(dto.getBancoFormas());
+        }
     }
 
     private void selecionaJogo(ComponentValueChangeEvent<Grid<Jogo>, Jogo> event){
@@ -124,39 +150,12 @@ public class CadastroContratosView extends VerticalLayout{
         jogoSelecionado = event.getValue();
     }
 
-    private void atualizarCamposPagamento(String tipoPagamento){
-        formCamposPagamento.removeAll();
-
-        if(radioFormaPagamento.getValue().equals("PIX") || radioFormaPagamento.getValue().equals("Cartão de crédito")){
-            formCamposPagamento.add(campoCodigoPagamento, campoDiaVencimento);
-            campoCodigoPagamento.setRequiredIndicatorVisible(true);
-            campoDiaVencimento.setRequiredIndicatorVisible(true);
-        }
-
-        if (tipoPagamento.equals("PIX")){
-            formCamposPagamento.add(campoChavePix);
-            campoChavePix.setRequiredIndicatorVisible(true);
-        } else if (tipoPagamento.equals("Cartão de crédito")){
-            formCamposPagamento.add(campoNumeroCartao, campoNomeTitularCartao, campoDataValidadeCartao);
-            campoNumeroCartao.setRequiredIndicatorVisible(true);
-            campoNomeTitularCartao.setRequiredIndicatorVisible(true);
-            campoDataValidadeCartao.setRequiredIndicatorVisible(true);
-        }
-    }
-
     public void salvarContrato(){
-        if(campoId.isEmpty() || clienteSelecionado == null || jogoSelecionado == null || campoPeriodo.isEmpty() 
-            || campoData.isEmpty() || campoCodigoPagamento.isEmpty() || campoDiaVencimento.isEmpty()){
+        if(campoId.isEmpty() || campoPeriodo.isEmpty() || campoData.isEmpty()){
             Notification.show("Preencha todos os campos obrigatórios.");
             if (campoId.isEmpty()){
                 campoId.setInvalid(true);
                 campoId.setErrorMessage("Este campo é obrigatório.");
-            }
-            if (clienteSelecionado == null){
-                Notification.show("Selecione um cliente.");
-            }
-            if (jogoSelecionado == null){
-                Notification.show("Selecione um jogo.");
             }
             if (campoPeriodo.isEmpty()){
                 campoPeriodo.setInvalid(true);
@@ -166,15 +165,20 @@ public class CadastroContratosView extends VerticalLayout{
                 campoData.setInvalid(true);
                 campoData.setErrorMessage("Este campo é obrigatório.");
             }
-            if (campoCodigoPagamento.isEmpty()){
-                campoCodigoPagamento.setInvalid(true);
-                campoCodigoPagamento.setErrorMessage("Este campo é obrigatório.");
-            }
-            if (campoDiaVencimento.isEmpty()){
-                campoDiaVencimento.setInvalid(true);
-                campoDiaVencimento.setErrorMessage("Este campo é obrigatório.");
-            }
 
+            return;
+        }
+
+        if (clienteSelecionado == null) {
+            Notification.show("Erro: Você deve selecionar um Cliente na tabela.");
+            return;
+        }
+        if (jogoSelecionado == null) {
+            Notification.show("Erro: Você deve selecionar um Jogo na tabela.");
+            return;
+        }
+        if (formaSelecionada == null) {
+            Notification.show("Erro: Você deve selecionar uma Forma de Pagamento na tabela.");
             return;
         }
 
@@ -182,10 +186,10 @@ public class CadastroContratosView extends VerticalLayout{
             int id = Integer.parseInt(campoId.getValue());
             int periodo = Integer.parseInt(campoPeriodo.getValue());
             LocalDate data = campoData.getValue();
-            String selecaoFormaPagamento = radioFormaPagamento.getValue();
 
             if (this.contratos.encontrarContratoId(id) != null) {
                 Notification.show("Erro: Já existe um contrato cadastrado com este ID.");
+                campoId.setInvalid(true);
                 return;
             }
             
@@ -194,79 +198,33 @@ public class CadastroContratosView extends VerticalLayout{
                 return;
             }
 
-            Contrato contrato;
-            FormaPagamento formaPagamento;
-
-            int codigo = Integer.parseInt(campoCodigoPagamento.getValue());
-            int diaVencimento = Integer.parseInt(campoDiaVencimento.getValue());
-
-            if (selecaoFormaPagamento.equals("PIX")){
-                if(campoChavePix.isEmpty()){
-                    campoChavePix.setInvalid(true);
-                    campoChavePix.setErrorMessage("Este campo é obrigatório.");
-                    Notification.show("Preencha todos os campos.");
-                    return;
-                }
-                String chavePix = campoChavePix.getValue();
-                Pix pix = new Pix(codigo, diaVencimento, chavePix);
-                formaPagamento = pix;
-            } else {
-                if(campoNumeroCartao.isEmpty() || campoNomeTitularCartao.isEmpty() || campoDataValidadeCartao.isEmpty()){
-                    Notification.show("Preencha todos os campos.");
-
-                    if(campoNumeroCartao.isEmpty()){
-                        campoNumeroCartao.setInvalid(true);
-                        campoNumeroCartao.setErrorMessage("Este campo é obrigatório.");
-                    }
-                    if(campoNomeTitularCartao.isEmpty()){
-                        campoNomeTitularCartao.setInvalid(true);
-                        campoNomeTitularCartao.setErrorMessage("Este campo é obrigatório.");
-                    }
-                    if(campoDataValidadeCartao.isEmpty()){
-                        campoDataValidadeCartao.setInvalid(true);
-                        campoDataValidadeCartao.setErrorMessage("Este campo é obrigatório.");
-                    }
-
-                    return;
-                }
-                String numeroCartao = campoNumeroCartao.getValue();
-                String nomeTitularCartao = campoNomeTitularCartao.getValue();
-                String dataValidadeCartao = campoDataValidadeCartao.getValue();
-                CartaoCredito cartaoCredito = new CartaoCredito(codigo, diaVencimento, numeroCartao, nomeTitularCartao, dataValidadeCartao);
-                formaPagamento = cartaoCredito;
-            }
-            contrato = new Contrato(id, periodo, clienteSelecionado, jogoSelecionado, data, formaPagamento);
-            
+            Contrato contrato = new Contrato(id, periodo, clienteSelecionado, jogoSelecionado, data, formaSelecionada);
 
             this.contratos.adicionarContrato(contrato);
             Notification.show("Contrato cadastrado com sucesso!");
             limparFormulario();
 
         } catch (NumberFormatException e) {
-            Notification.show("Erro: Verifique se os campos ID, Número, Código e Dia de Vencimento contém apenas números válidos.");
+            Notification.show("Erro: Verifique se os campos ID e Período contêm apenas números válidos.");
         } catch (NullPointerException e) {
             Notification.show("Erro: Jogo ou Cliente não foram encontrados.");
         } catch (Exception e){
-            Notification.show("Ocorreu um erro inesperado.");
+            Notification.show("Ocorreu um erro inesperado." + e.getMessage());
         }
 
     }
 
     private void limparFormulario() {
         campoId.clear();
+        campoPeriodo.clear();
+        campoData.clear();
         clienteSelecionado = null;
         if (gridCliente != null) gridCliente.asSingleSelect().clear();
         jogoSelecionado = null;
         if (gridJogos != null) gridJogos.asSingleSelect().clear();
-        campoPeriodo.clear();
-        campoData.clear();
-        radioFormaPagamento.setValue("Não informado");
-        campoChavePix.clear();
-        campoCodigoPagamento.clear();
-        campoDiaVencimento.clear();
-        campoDataValidadeCartao.clear();
-        campoNomeTitularCartao.clear();
-        campoNumeroCartao.clear();
+        formaSelecionada = null;
+        if (gridFormas != null) gridFormas.asSingleSelect().clear();
+        gridFormas.setItems(new ArrayList<>());
     }
 
 }

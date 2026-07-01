@@ -49,6 +49,10 @@ public class MainLayout extends AppLayout {
 
         grupoClientes.addItem(subCadastrarCliente);
         grupoClientes.addItem(subListaClientes);
+
+        /* grupo ações formas de pagamento */
+        SideNavItem CadastrarFormaPagamento = new SideNavItem("Cadastrar Forma de Pagamento", CadastroFormaPagamentoView.class);
+        CadastrarFormaPagamento.setPrefixComponent(VaadinIcon.CREDIT_CARD.create());
         
         /* grupo ações jogos */
         SideNavItem grupoJogos = new SideNavItem("Jogos");
@@ -63,15 +67,45 @@ public class MainLayout extends AppLayout {
         grupoJogos.addItem(subCadastrarJogo);
         grupoJogos.addItem(subListaJogos);
 
+        /* grupo ações contratos */
+         SideNavItem grupoContratos = new SideNavItem("Contratos");
+        grupoContratos.setPrefixComponent(VaadinIcon.CLIPBOARD_TEXT.create());
 
-        SideNavItem itemContratos = new SideNavItem("Cadastrar Contratos", CadastroContratosView.class);
-        itemContratos.setPrefixComponent(VaadinIcon.BUILDING.create());
+        SideNavItem subCadastrarContrato = new SideNavItem("Cadastrar Contrato", CadastroContratosView.class);
+        subCadastrarContrato.setPrefixComponent(VaadinIcon.PLUS_CIRCLE.create());
 
+        SideNavItem subListaContrato = new SideNavItem("Lista de Contratos", ListaContratosView.class); 
+        subListaContrato.setPrefixComponent(VaadinIcon.LIST.create());
+
+        grupoContratos.addItem(subCadastrarContrato);
+        grupoContratos.addItem(subListaContrato);
+
+        /* grupo de consultas especiais */
+        SideNavItem grupoConsultarMaior = new SideNavItem("Consultar Maior");
+        grupoConsultarMaior.setPrefixComponent(VaadinIcon.SEARCH.create());
+
+        SideNavItem subConsultarMaiorJogo = new SideNavItem("Valor Diário Jogo", JogoMaiorValorView.class);
+        subConsultarMaiorJogo.setPrefixComponent(VaadinIcon.SEARCH.create());
+
+        SideNavItem subConsultarMaiorContrato = new SideNavItem("Valor Final Contrato", ContratoMaiorValorView.class);
+        subConsultarMaiorContrato.setPrefixComponent(VaadinIcon.SEARCH.create());
+
+        SideNavItem subConsultarMaiorNumeroContrato = new SideNavItem("Numero de Contratos", ClienteMaiorMontanteView.class);
+        subConsultarMaiorNumeroContrato.setPrefixComponent(VaadinIcon.SEARCH.create());
+
+        grupoConsultarMaior.addItem(subConsultarMaiorContrato, subConsultarMaiorNumeroContrato, subConsultarMaiorJogo);
+
+        /* Gerenciamento de Dados */
+        SideNavItem gerenciamentoDados = new SideNavItem("Importar/Exportar dados", GerenciamentoDadosView.class);
+        gerenciamentoDados.setPrefixComponent(VaadinIcon.DOWNLOAD_ALT.create());
 
         nav.addItem(itemHome);
         nav.addItem(grupoClientes);
+        nav.addItem(CadastrarFormaPagamento);
         nav.addItem(grupoJogos);
-        nav.addItem(itemContratos);
+        nav.addItem(grupoContratos);
+        nav.addItem(grupoConsultarMaior);
+        nav.addItem(gerenciamentoDados);
 
         addToDrawer(nav);
     }
