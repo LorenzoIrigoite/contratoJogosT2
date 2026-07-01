@@ -1,7 +1,10 @@
 package com.grupopoo.dados;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import org.springframework.stereotype.Repository;
+
+import com.grupopoo.app.ValorReservadoException;
 
 @Repository
 public class ClienteRepository {
@@ -12,8 +15,13 @@ public class ClienteRepository {
     }
 
     //INSERIR, ALTERAR E REMOVER
-    public void adicionarCliente(Cliente c){
+    public void adicionarCliente(Cliente c) {
+        if (c.getNumero() == 99999) {
+            throw new ValorReservadoException("Número do cliente inválido. O código 99999 é reservado pelo sistema.");
+        }
+        
         clientes.add(c);
+        clientes.sort(Comparator.comparingInt(Cliente::getNumero));
     }
 
     public boolean removerCliente(Cliente cliente){
@@ -29,20 +37,20 @@ public class ClienteRepository {
     public void alterarDadosCliente(Cliente cliente, int numero){
         //criar um cliente auxiliar na APP e copiar as informações dele para o cliente que desejo alterar
         //criar tratamento de excessões
-        clientes.get(numero).setNome(cliente.getNome());
-        clientes.get(numero).setEmail(cliente.getEmail());
+        Cliente c = encontrarClienteNumero(numero);
+        c.setNome(cliente.getNome());
+        c.setEmail(cliente.getEmail());
 
-        if (cliente instanceof Corporativo){
-            Corporativo c = (Corporativo)cliente;
-            Corporativo atualizar = (Corporativo)clientes.get(numero);
+        if (cliente instanceof Corporativo corporativo){
+            Corporativo atualizar = (Corporativo)c;
 
-            atualizar.setCnpj(c.getCnpj());
-            atualizar.setNomeFantasia(c.getNomeFantasia());
+            atualizar.setCnpj(corporativo.getCnpj());
+            atualizar.setNomeFantasia(corporativo.getNomeFantasia());
         } else {
-            Individual c = (Individual)cliente;
-            Individual atualizar = (Individual)clientes.get(numero);
+            Individual individual = (Individual)cliente;
+            Individual atualizar = (Individual)c;
 
-            atualizar.setCpf(c.getCpf());
+            atualizar.setCpf(individual.getCpf());
         }
     }
 
@@ -101,5 +109,17 @@ public class ClienteRepository {
             aux.add(cliente);
         }
         return aux;
+    }
+
+    public ArrayList<Cliente> getArrayList(){
+        return clientes;
+    }
+
+    public int size(){
+        int qtd = 0;
+        for (Cliente c : clientes){
+            qtd++;
+        }
+        return qtd;
     }
 }

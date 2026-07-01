@@ -26,12 +26,6 @@ public class Contrato {
         this.formaPagamento = formaPagamento;
     }
 
-    public Contrato( int periodo, Cliente cliente, Jogo jogo){
-        this.periodo = periodo;
-        this.cliente = cliente;
-        this.jogo = jogo;
-    }
-
     public int getId(){return id;}
     public int getPeriodo(){return periodo;}
     public Cliente getCliente(){return cliente;}
@@ -39,22 +33,22 @@ public class Contrato {
     public LocalDate getData(){return data;}
 
     public double calculaValorFinal(){
-        double valor = jogo.getValorDiaria();
+        double valor = jogo.getValorDiario();
 
         //regra das categorias
         if (jogo.getCategoria() == Categoria.AVENTURA){
-            valor += (jogo.getValorDiaria() * 0.05);
+            valor += (jogo.getValorDiario() * 0.05);
         } else if (jogo.getCategoria() == Categoria.CORRIDA){
-            valor += (jogo.getValorDiaria() * 0.15);
+            valor += (jogo.getValorDiario() * 0.15);
         } else {
-            valor += (jogo.getValorDiaria() * 0.1);
+            valor += (jogo.getValorDiario() * 0.1);
         }
 
         //regra das formas de pagamento
         if (formaPagamento instanceof Pix){
-            valor += (jogo.getValorDiaria() * 0.05);
+            valor += (jogo.getValorDiario() * 0.05);
         } else {
-            valor += (jogo.getValorDiaria() * 0.05);
+            valor += (jogo.getValorDiario() * 0.05);
         }
 
         return valor;

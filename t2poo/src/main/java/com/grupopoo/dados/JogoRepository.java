@@ -1,6 +1,8 @@
 package com.grupopoo.dados;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -13,6 +15,7 @@ public class JogoRepository{
 
     public void adicionarJogo(Jogo j){
         jogos.add(j);
+        jogos.sort(Comparator.comparingInt(Jogo::getCodigo));
     }
 
     public Jogo encontrarJogoCodigo(int codigo){
@@ -45,7 +48,7 @@ public class JogoRepository{
     public ArrayList<Jogo> jogosAcimaValorMinuto(double valorMinuto){
         ArrayList<Jogo> aux = new ArrayList<Jogo>();
         for (Jogo j : jogos){
-            if (j.getValorDiaria() >= valorMinuto) 
+            if (j.getValorDiario() >= valorMinuto) 
                 aux.add(j);
         }
         return aux;
@@ -54,7 +57,7 @@ public class JogoRepository{
     public ArrayList<Jogo> jogosAbaixoValorMinuto(double valorMinuto){
         ArrayList<Jogo> aux = new ArrayList<Jogo>();
         for (Jogo j : jogos){
-            if (j.getValorDiaria() <= valorMinuto) 
+            if (j.getValorDiario() <= valorMinuto) 
                 aux.add(j);
         }
         return aux;
@@ -66,6 +69,18 @@ public class JogoRepository{
             aux.add(j);
         }
         return aux;
+    }
+
+    public ArrayList<Jogo> getArrayList(){
+        return jogos;
+    }
+
+    public int size(){
+        int qtd = 0;
+        for (Jogo j : jogos){
+            qtd++;
+        }
+        return qtd;
     }
 
     public boolean removerJogo(Jogo jogo){

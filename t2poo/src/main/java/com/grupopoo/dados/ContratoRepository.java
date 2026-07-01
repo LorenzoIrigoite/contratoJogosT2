@@ -30,7 +30,7 @@ public class ContratoRepository {
         double valor = 0;
         for(Contrato c : contratos){
             if (c.getCliente() == cliente){
-                valor+=c.getJogo().getValorDiaria();
+                valor+=c.getJogo().getValorDiario();
             }
         }
         return valor;
