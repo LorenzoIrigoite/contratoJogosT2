@@ -38,14 +38,24 @@ public class Persistencia {
         
         this.mapper = new ObjectMapper();
         this.mapper.registerModule(new JavaTimeModule());
+
+        this.mapper.registerSubtypes(
+        new com.fasterxml.jackson.databind.jsontype.NamedType(Individual.class, "individual"),
+        new com.fasterxml.jackson.databind.jsontype.NamedType(Corporativo.class, "corporativo")
+    );
     }
 
     public void salvarDados() throws IOException {
         // grava os ArrayLists e o Map nos arquivos
-        mapper.writeValue(new File(ARQUIVO_CLIENTES), clientes.listarClientes());
-        mapper.writeValue(new File(ARQUIVO_JOGOS), jogos.getArrayList()); 
+        mapper.writerFor(new com.fasterxml.jackson.core.type.TypeReference<List<Cliente>>() {})
+          .writeValue(new File(ARQUIVO_CLIENTES), clientes.getArrayList());
+
+        mapper.writeValue(new File(ARQUIVO_JOGOS), jogos.getArrayList());
+        
         mapper.writeValue(new File(ARQUIVO_CONTRATOS), contratos.getArrayList());
-        mapper.writeValue(new File(ARQUIVO_FORMAS_PAGAMENTO), formasPagamento.getMap());
+        
+        mapper.writerFor(new com.fasterxml.jackson.core.type.TypeReference<Map<Integer, List<FormaPagamento>>>() {})
+          .writeValue(new File(ARQUIVO_FORMAS_PAGAMENTO), formasPagamento.getMap());
     }
 
     public void carregarDados() throws IOException {
@@ -56,7 +66,7 @@ public class Persistencia {
 
         // carregamento dos Clientes com validações de limpeza e prevenção de duplicatas
         if (fClientes.exists()) {
-            clientes.listarClientes().clear();
+            clientes.getArrayList().clear();
             Cliente[] clientesCarregados = mapper.readValue(fClientes, Cliente[].class);
             for (Cliente c : clientesCarregados) {
                 clientes.adicionarCliente(c);
