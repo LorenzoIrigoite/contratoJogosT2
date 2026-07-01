@@ -11,7 +11,6 @@ public class ClienteFormaDTO {
         this.bancoFormas = bancoFormas;
     }
 
-
     public int getCod() {
         return this.cod;
     }

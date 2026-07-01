@@ -1,4 +1,5 @@
 package com.grupopoo.dados;
+
 public class Jogo {
     private int codigo;
     private String nome;
@@ -13,6 +14,8 @@ public class Jogo {
         this.valorDiario = valorDiario;
         this.categoria = categoria;
     }
+
+    public Jogo() {}
 
     public int getCodigo(){return codigo;}
     public String getNome() {return nome;}

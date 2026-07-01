@@ -1,4 +1,5 @@
 package com.grupopoo.dados;
+
 import java.time.LocalDate;
 
 public class Contrato {
@@ -17,6 +18,8 @@ public class Contrato {
         this.data = data;
         this.formaPagamento = formaPagamento;
     }
+
+    public Contrato() {}
 
     public int getId(){return id;}
     public int getPeriodo(){return periodo;}

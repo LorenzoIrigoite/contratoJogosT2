@@ -12,6 +12,10 @@ public class CartaoCredito extends FormaPagamento {
         this.nomeTitular = nomeTitular;
     }
 
+    public CartaoCredito() {
+        super(0, 0);
+    }
+
     public String getNumero(){return numero;}
     public String getValidade(){return validade;}
     public String getNomeTitular(){return nomeTitular;}

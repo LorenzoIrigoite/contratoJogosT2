@@ -35,4 +35,8 @@ public class FormaPagamentoRepository {
         return null;
     }
 
+    public Map<Integer, List<FormaPagamento>> getMap(){
+        return bancoFormas;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.grupopoo.dados;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.time.LocalDate;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +17,8 @@ public class ContratoRepository {
 
     public void adicionarContrato(Contrato c){
         contratos.add(c);
+        // armazenando os contratos em ordem decrescente
+        contratos.sort(Comparator.comparingInt(Contrato::getId).reversed());
     }
 
     public Contrato encontrarContratoId(int id){

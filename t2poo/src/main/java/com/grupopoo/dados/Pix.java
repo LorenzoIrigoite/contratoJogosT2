@@ -7,6 +7,10 @@ public class Pix extends FormaPagamento {
         super(codigo, diaVencimento);
         this.chave = chave;
     }
+    
+    public Pix() {
+        super(0, 0);
+    }
 
     public String getChave(){return chave;}
     public void setChave(String chave){this.chave = chave;}

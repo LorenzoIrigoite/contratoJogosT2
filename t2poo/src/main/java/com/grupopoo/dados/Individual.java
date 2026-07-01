@@ -8,6 +8,11 @@ public class Individual extends Cliente{
         this.cpf = cpf;
     }
 
+    // construtor vazio pra uso do JSON
+    public Individual() {
+        super(0, "", "");
+    }
+
     public String getCpf(){return cpf;}
     
     public void setCpf(String cpf){this.cpf = cpf;}

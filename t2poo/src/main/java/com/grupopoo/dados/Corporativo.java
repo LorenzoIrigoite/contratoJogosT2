@@ -10,6 +10,10 @@ public class Corporativo extends Cliente{
         this.nomeFantasia = nomeFantasia;
     }
     
+    public Corporativo() {
+        super(0, "", "");
+    }
+
     public String getCnpj(){return cnpj;}
     public String getNomeFantasia(){return nomeFantasia;}
 
