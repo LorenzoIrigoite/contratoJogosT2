@@ -17,7 +17,7 @@ public class Jogo {
     public int getCodigo(){return codigo;}
     public String getNome() {return nome;}
     public int getAno(){return ano;}
-    public double getValorDiaria(){return valorDiario;}
+    public double getValorDiario(){return valorDiario;}
     public Categoria getCategoria(){return categoria;}
     
     public String descrever(){
