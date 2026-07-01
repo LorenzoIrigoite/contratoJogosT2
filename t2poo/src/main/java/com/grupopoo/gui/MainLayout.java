@@ -21,6 +21,7 @@ public class MainLayout extends AppLayout {
         H1 logo = new H1("ACMESpiele");
         logo.getStyle().set("font-size", "var(--lumo-font-size-l)");
         logo.getStyle().set("margin", "0 var(--lumo-space-m)");
+        logo.getStyle().set("cursor", "pointer");
         logo.addClickListener(e -> UI.getCurrent().navigate(""));
 
         HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo);
@@ -36,18 +37,40 @@ public class MainLayout extends AppLayout {
         SideNavItem itemHome = new SideNavItem("Home", MainView.class);
         itemHome.setPrefixComponent(VaadinIcon.HOME.create());
 
-        SideNavItem itemClientes = new SideNavItem("Cadastrar Clientes", CadastroClientesView.class);
-        itemClientes.setPrefixComponent(VaadinIcon.USER.create());
+        /* grupo ações clientes */
+        SideNavItem grupoClientes = new SideNavItem("Clientes");
+        grupoClientes.setPrefixComponent(VaadinIcon.USER.create());
+
+        SideNavItem subCadastrarCliente = new SideNavItem("Cadastrar Cliente", CadastroClientesView.class);
+        subCadastrarCliente.setPrefixComponent(VaadinIcon.PLUS_CIRCLE.create());
+
+        SideNavItem subListaClientes = new SideNavItem("Lista de Clientes", ListaClientesView.class); 
+        subListaClientes.setPrefixComponent(VaadinIcon.LIST.create());
+
+        grupoClientes.addItem(subCadastrarCliente);
+        grupoClientes.addItem(subListaClientes);
         
-        SideNavItem itemJogos = new SideNavItem("Cadastrar Jogos", CadastroJogosView.class);
-        itemJogos.setPrefixComponent(VaadinIcon.GAMEPAD.create());
+        /* grupo ações jogos */
+        SideNavItem grupoJogos = new SideNavItem("Jogos");
+        grupoJogos.setPrefixComponent(VaadinIcon.GAMEPAD.create());
+
+        SideNavItem subCadastrarJogo = new SideNavItem("Cadastrar Jogo", CadastroJogosView.class);
+        subCadastrarJogo.setPrefixComponent(VaadinIcon.PLUS_CIRCLE.create());
+
+        SideNavItem subListaJogos = new SideNavItem("Lista de Jogos", ListaJogosView.class); 
+        subListaJogos.setPrefixComponent(VaadinIcon.LIST.create());
+
+        grupoJogos.addItem(subCadastrarJogo);
+        grupoJogos.addItem(subListaJogos);
+
 
         SideNavItem itemContratos = new SideNavItem("Cadastrar Contratos", CadastroContratosView.class);
         itemContratos.setPrefixComponent(VaadinIcon.BUILDING.create());
 
+
         nav.addItem(itemHome);
-        nav.addItem(itemClientes);
-        nav.addItem(itemJogos);
+        nav.addItem(grupoClientes);
+        nav.addItem(grupoJogos);
         nav.addItem(itemContratos);
 
         addToDrawer(nav);

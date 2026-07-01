@@ -14,6 +14,9 @@ import com.grupopoo.dados.Jogo;
 import com.grupopoo.dados.JogoRepository;
 import com.grupopoo.dados.Pix;
 
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -26,7 +29,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.atmosphere.util.analytics.JGoogleAnalyticsTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @PageTitle ("Cadastro de Contratos")
@@ -34,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CadastroContratosView extends VerticalLayout{
     private ContratoRepository contratos;
     private JogoRepository jogos;
-    private ClienteRepository clientela;
+    private ClienteRepository clientes;
 
     private TextField campoId = new TextField("Id:");
     private TextField campoPeriodo = new TextField("Período");
@@ -48,24 +50,46 @@ public class CadastroContratosView extends VerticalLayout{
     private TextField campoDataValidadeCartao = new TextField("Vencimento do cartão:");
     
     private DatePicker campoData = new DatePicker("Data do contrato:");
-    
     private RadioButtonGroup<String> radioFormaPagamento = new RadioButtonGroup<>();
-
     private Button botaoSalvar = new Button("Cadastrar Contrato");
 
     private FormLayout formCamposPagamento = new FormLayout();
+    private FormLayout formClientes = new FormLayout();
+    private FormLayout formJogos = new FormLayout();
+
+    private final Grid<Cliente> gridCliente;
+    private final Grid<Jogo> gridJogos;
+
+    private Cliente clienteSelecionado;
 
     @Autowired
-    public CadastroContratosView(ContratoRepository contratos, JogoRepository jogos, ClienteRepository clientela){
-        this.clientela = clientela;
+    public CadastroContratosView(ContratoRepository contratos, JogoRepository jogos, ClienteRepository clientes){
+        this.clientes = clientes;
         this.jogos = jogos;
         this.contratos = contratos;
+
+
+        gridCliente = new Grid<>(Cliente.class);
+        gridCliente.setItems(clientes.getArrayList());
+        gridCliente.setColumns("numero", "nome", "email");
+        gridCliente.asSingleSelect();
+
+        formClientes.add(gridCliente);
+
+
+        gridJogos = new Grid<>(Jogo.class);
+        gridJogos.setItems(jogos.getArrayList());
+        gridJogos.setColumns("codigo", "nome", "ano", "valorDiario", "categoria");
+        gridJogos.asSingleSelect();
+
+        formJogos.add(gridJogos);
+
 
         radioFormaPagamento.setLabel("Forma de Pagamento:");
         radioFormaPagamento.setItems("Cartão de crédito", "PIX", "Não informado");
         radioFormaPagamento.setValue("Não informado");
         atualizarCamposPagamento("Não informado");
-
+        
         radioFormaPagamento.addValueChangeListener(event -> {
             atualizarCamposPagamento(event.getValue());
         });
@@ -81,7 +105,7 @@ public class CadastroContratosView extends VerticalLayout{
         Stream.of(campoId, campoCliente, campoJogo, campoPeriodo, campoData)
               .forEach(campo -> campo.setRequiredIndicatorVisible(true));
 
-        add(campoId, campoCliente, campoJogo, campoPeriodo, campoData, radioFormaPagamento, formCamposPagamento, botaoSalvar);
+        add(campoId, campoPeriodo, campoData, formClientes, formJogos, radioFormaPagamento, formCamposPagamento, botaoSalvar);
     }
 
     public void atualizarCamposPagamento(String tipoPagamento){
@@ -144,7 +168,7 @@ public class CadastroContratosView extends VerticalLayout{
                 return;
             }
 
-            Cliente cliente = clientela.encontrarClienteNumero(numeroCliente);
+            Cliente cliente = clientes.encontrarClienteNumero(numeroCliente);
             Jogo jogo = jogos.encontrarJogoCodigo(codigoJogo);
             
             Contrato contrato;

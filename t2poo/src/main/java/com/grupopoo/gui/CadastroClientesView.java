@@ -1,5 +1,6 @@
 package com.grupopoo.gui;
 
+import com.grupopoo.app.ValorReservadoException;
 import com.grupopoo.dados.ClienteRepository;
 import com.grupopoo.dados.Individual;
 import com.grupopoo.dados.Corporativo;
@@ -21,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route (value = "cadastroClientes", layout = MainLayout.class)
 public class CadastroClientesView extends VerticalLayout{
     //criação do repositório na view
-    private ClienteRepository clientela;
+    private ClienteRepository clientes;
 
     //criação dos itens visuais da tela
     private TextField campoNumero = new TextField("Número:");
@@ -37,8 +38,8 @@ public class CadastroClientesView extends VerticalLayout{
 
     //avisa pro Spring que a view depende de outra classe, no caso ClienteRepository
     @Autowired
-    public CadastroClientesView(ClienteRepository clientela){
-        this.clientela = clientela;
+    public CadastroClientesView(ClienteRepository clientes){
+        this.clientes = clientes;
 
         H2 tituloPagina = new H2("Cadastro de Clientes");
 
@@ -112,7 +113,7 @@ public class CadastroClientesView extends VerticalLayout{
             String email = campoEmail.getValue();
 
             //verifica se cliente com mesmo número já existe
-            if (this.clientela.encontrarClienteNumero(numero) != null) {
+            if (this.clientes.encontrarClienteNumero(numero) != null) {
                 Notification.show("Erro: Já existe um cliente cadastrado com este número.");
                 return;
             }
@@ -128,7 +129,7 @@ public class CadastroClientesView extends VerticalLayout{
                 String cpf = campoCpf.getValue();
                 Individual cliente = new Individual(numero, nome, email, cpf);
                 
-                this.clientela.adicionarCliente(cliente);
+                this.clientes.adicionarCliente(cliente);
                 Notification.show("Cliente Individual cadastrado com sucesso!");
                 
             } else {
@@ -148,14 +149,15 @@ public class CadastroClientesView extends VerticalLayout{
                 String nomeFantasia = campoNomeFantasia.getValue();
                 Corporativo cliente = new Corporativo(numero, nome, email, cnpj, nomeFantasia);
                 
-                this.clientela.adicionarCliente(cliente);
+                this.clientes.adicionarCliente(cliente);
                 Notification.show("Cliente Corporativo cadastrado com sucesso!");
             }
 
             limparFormulario();
-
         } catch (NumberFormatException e) {
             Notification.show("Erro: O campo Número precisa ser um valor numérico válido.");
+        } catch (ValorReservadoException e) {
+            Notification.show("Erro: O Número do cliente não pode ser 99999.");
         } catch (Exception e){
             Notification.show("Ocorreu um erro inesperado.");
         }

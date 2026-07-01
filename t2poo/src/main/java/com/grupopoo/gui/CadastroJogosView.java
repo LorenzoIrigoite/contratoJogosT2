@@ -56,6 +56,7 @@ public class CadastroJogosView extends VerticalLayout {
     */
 
     private void salvarJogo(){
+
         if (campoCodigo.isEmpty() || campoNome.isEmpty() || campoAno.isEmpty() || campoValorDiario.isEmpty() || selectCategorias.isEmpty()){
             Notification.show("Preencha todos os campos.");
 
@@ -90,6 +91,11 @@ public class CadastroJogosView extends VerticalLayout {
             double valorDiario = campoValorDiario.getValue();
             String nomeCategoria = selectCategorias.getValue();
 
+            if (this.jogos.encontrarJogoCodigo(codigo) != null) {
+                Notification.show("Erro: Já existe um cliente cadastrado com este número.");
+                return;
+            }
+
             Categoria categoria;
             if (nomeCategoria.equals("Aventura"))
                 categoria = Categoria.AVENTURA;
@@ -104,6 +110,8 @@ public class CadastroJogosView extends VerticalLayout {
 
         } catch (NumberFormatException e){
             Notification.show("Erro: O campo Código e o campo Ano precisam ser um valor numérico válido.");
+        } catch (IllegalArgumentException e) {
+
         } catch (Exception e){
             Notification.show("Ocorreu um erro inesperado.");
         }
