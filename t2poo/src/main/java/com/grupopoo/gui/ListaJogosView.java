@@ -35,10 +35,12 @@ public class ListaJogosView extends VerticalLayout {
         if(jogos.size() == 0){
             Notification.show("Ainda não há nenhum jogo cadastrado.");
         } else {
-            add(tituloPagina, gridJogos);
-            add(new Hr());
+            add(tituloPagina, gridJogos, new Hr());
+            atualizarLista();
         }
+    }
 
-
+    private void atualizarLista() {
+        gridJogos.setItems(jogos.getArrayList()); 
     }
 }
