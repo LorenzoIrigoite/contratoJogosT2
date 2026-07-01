@@ -9,14 +9,6 @@ public class Contrato {
     private Jogo jogo;
     private FormaPagamento formaPagamento;
 
-    public Contrato(int id, int periodo, Cliente cliente, Jogo jogo, LocalDate data){
-        this.id = id;
-        this.periodo = periodo;
-        this.cliente = cliente;
-        this.jogo = jogo;
-        this.data = data;
-    }
-
     public Contrato(int id, int periodo, Cliente cliente, Jogo jogo, LocalDate data, FormaPagamento formaPagamento){
         this.id = id;
         this.periodo = periodo;
@@ -31,6 +23,7 @@ public class Contrato {
     public Cliente getCliente(){return cliente;}
     public Jogo getJogo(){return jogo;}
     public LocalDate getData(){return data;}
+    public FormaPagamento getFormaPagamento(){return formaPagamento;}
 
     public double calculaValorFinal(){
         double valor = jogo.getValorDiario();

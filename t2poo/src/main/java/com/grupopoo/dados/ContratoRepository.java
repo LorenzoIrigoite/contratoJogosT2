@@ -1,6 +1,7 @@
 package com.grupopoo.dados;
 
 import java.util.ArrayList;
+import java.time.LocalDate;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -60,6 +61,27 @@ public class ContratoRepository {
         return aux;
     }
 
+    public ArrayList<Contrato> getArrayList(){
+        return contratos;
+    }
+
+    public boolean jogoDisponivel(Jogo j, LocalDate dataDesejada) {
+        for (Contrato c : contratos) {
+            if (c.getJogo().getCodigo() == j.getCodigo()) {
+                LocalDate dataInicioExistente = c.getData();
+                LocalDate dataTerminoExistente = c.getData().plusDays(c.getPeriodo());
+
+                boolean conflitaInicio = !dataDesejada.isBefore(dataInicioExistente);
+                boolean conflitaFim = !dataDesejada.isAfter(dataTerminoExistente);
+
+                if (conflitaInicio && conflitaFim) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public ArrayList<Contrato> removerContratosPorJogo(Jogo jogo){
         ArrayList<Contrato> contratosRemovidos = new ArrayList<Contrato>();
         for (Contrato c : contratos){
@@ -73,6 +95,23 @@ public class ContratoRepository {
         }
 
         return contratosRemovidos;
-    }   
+    }
 
+    public boolean removerContrato(Contrato contrato){
+        for(Contrato c : contratos){
+            if (c == contrato){
+                contratos.remove(c);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int size(){
+        int qtd = 0;
+        for (Contrato c : contratos){
+            qtd++;
+        }
+        return qtd;
+    }
 }
