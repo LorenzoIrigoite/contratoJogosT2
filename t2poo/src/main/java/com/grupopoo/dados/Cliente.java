@@ -1,5 +1,18 @@
 package com.grupopoo.dados;
 
+//biblioteca para notificar ao JSON a diferença das classes que devem ser instanciadas
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(
+  use = JsonTypeInfo.Id.NAME, 
+  include = JsonTypeInfo.As.PROPERTY, 
+  property = "tipo"
+)
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = Individual.class, name = "individual"),
+  @JsonSubTypes.Type(value = Corporativo.class, name = "corporativo")
+})
 public abstract class Cliente {
     private int numero;
     private String nome;

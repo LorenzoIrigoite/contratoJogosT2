@@ -1,5 +1,17 @@
 package com.grupopoo.dados;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(
+  use = JsonTypeInfo.Id.NAME, 
+  include = JsonTypeInfo.As.PROPERTY, 
+  property = "tipo"
+)
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = Pix.class, name = "pix"),
+  @JsonSubTypes.Type(value = CartaoCredito.class, name = "cartao")
+})
 public abstract class FormaPagamento {
     private int codigo;
     private int diaVencimento;
