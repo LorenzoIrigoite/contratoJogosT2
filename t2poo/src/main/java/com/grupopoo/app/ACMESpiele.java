@@ -1,5 +1,6 @@
 package com.grupopoo.app;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -14,7 +15,8 @@ import java.util.ArrayList;
 
 import com.grupopoo.dados.*;
 
-@Service
+//Classe utilizada para controle do sistema via terminal
+//@Service
 public class ACMESpiele {
     // Atributos para redirecionamento de E/S
     
@@ -30,13 +32,14 @@ public class ACMESpiele {
     //Scanner entrada = new Scanner(System.in);
 
     // Construtor da classe de aplicacao
-    public ACMESpiele() {
-        redirecionaEntrada();    // Redireciona Entrada para arquivos
-        redirecionaSaida();    // Redireciona Saida para arquivos
+    @Autowired 
+    public ACMESpiele(ClienteRepository clientela, JogoRepository jogos, ContratoRepository contratos) {
+        //redirecionaEntrada();    // Redireciona Entrada para arquivos
+        //redirecionaSaida();    // Redireciona Saida para arquivos
 
-        clientela = new ClienteRepository();
-        jogos = new JogoRepository();
-        contratos = new ContratoRepository();
+        this.clientela = clientela;
+        this.jogos = jogos;
+        this.contratos = contratos;
 
     }
 
@@ -185,9 +188,10 @@ public class ACMESpiele {
         } else
             System.out.println("3:erro-codigo repetido.");
     }
-
+    
     public void cadastrarContrato(int id){
         //System.out.print("Digite o período do contrato: ");
+        /*
         int periodo = entrada.nextInt();
         //System.out.print("Digite o numero do cliente: ");
         int numero = entrada.nextInt();
@@ -204,13 +208,15 @@ public class ACMESpiele {
                 System.out.println("4:erro-jogo inexistente.");
                 return;
             }
+
             Contrato contrato = new Contrato(id, periodo, cliente, jogo);
             contratos.adicionarContrato(contrato);
             System.out.println("4:" + contrato.descrever());
         } else
             System.out.println("4:erro-id repetido.");
+        */
     }
-
+    
     public void consultarJogoCodigo(int codigo){
         Jogo jogo = jogos.encontrarJogoCodigo(codigo);
         if (jogo != null){
@@ -307,7 +313,8 @@ public class ACMESpiele {
 //---------------------------MÉTODOS PARA LER DADOS DE ARQUIVO--------------------------------------------
     // Redireciona Entrada de dados para arquivos em vez de teclado
     // Chame este metodo para redirecionar a leitura de dados para arquivos
-    
+/*
+
     private void redirecionaEntrada() {
         try {
             BufferedReader streamEntrada = new BufferedReader(new FileReader(nomeArquivoEntrada));
@@ -342,6 +349,7 @@ public class ACMESpiele {
     private void restauraSaida() {
         System.setOut(saidaPadrao);
     }
-//---------------------------------------------------------------------------------------
+*/
+    //---------------------------------------------------------------------------------------
 
 }
