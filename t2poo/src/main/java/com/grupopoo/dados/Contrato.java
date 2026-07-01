@@ -26,6 +26,12 @@ public class Contrato {
         this.formaPagamento = formaPagamento;
     }
 
+    public Contrato( int periodo, Cliente cliente, Jogo jogo){
+        this.periodo = periodo;
+        this.cliente = cliente;
+        this.jogo = jogo;
+    }
+
     public int getId(){return id;}
     public int getPeriodo(){return periodo;}
     public Cliente getCliente(){return cliente;}
